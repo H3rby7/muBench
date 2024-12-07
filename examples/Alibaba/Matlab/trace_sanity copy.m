@@ -89,7 +89,10 @@ function [sanitized_traces,v_G_sub] = trace_sanity_copy(callg,entry_service_id,N
                 break
             end
             if rpcid_last_call_num ~= 1
+                % this calculation will always return the original 'rpc_id'
+                % WHy?
                 rpcid_sibling = convertStringsToChars(string(rpcid(1:last_dot))+num2str(rpcid_last_call_num));
+                % which means this will never be empty, as we just find the same item.
                 if isempty(find(strcmp(trace_g.rpcid,rpcid_sibling),1))
                     % parent doesn't exist
                     sanity_check=false;
