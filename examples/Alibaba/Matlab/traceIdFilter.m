@@ -12,8 +12,10 @@ function traceIdFilter(data, ~, intermKVStore, entry_service_id)
         traceid = trace_ids(i);
 
         % 'traceid'     must match
+        related_entries = data((strcmp(data.traceid,traceid)>0),:);
+
         % 'dm' length   must be 64
-        related_entries = data((strcmp(data.traceid,traceid)>0 & cellfun(@length,data.dm) == 64),:);
+        related_entries = related_entries((cellfun(@length,related_entries.dm) == 64),:);
 
         % Fix um '?' for 0.1
         % In these traces, it happens that some metrics in MS_CallGraph_Table are lost. 
@@ -24,7 +26,7 @@ function traceIdFilter(data, ~, intermKVStore, entry_service_id)
         related_entries.um(um_is_entry_service) = {entry_service_id};
         
         % 'um' length   must be 64
-        % related_entries = related_entries((cellfun(@length,related_entries.um) == 64),:);
+        related_entries = related_entries((cellfun(@length,related_entries.um) == 64),:);
         asCells{i} = table2cell(related_entries);
     end
 
