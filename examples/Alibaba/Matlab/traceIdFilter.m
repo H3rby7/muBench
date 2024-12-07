@@ -10,7 +10,18 @@ function traceIdFilter(data, ~, intermKVStore, entry_service_id)
 
     for i=1:height(trace_ids)
         traceid = trace_ids(i);
+
+        % Matching traceid and 
+        % 'dm' field length is 64
         related_entries = data((strcmp(data.traceid,traceid)>0 & cellfun(@length,data.dm) == 64),:);
+
+        % Fix um '?' for 0.1
+        % In these traces, it happens that some metrics in MS_CallGraph_Table are lost. 
+        % For example, the name of some MS is recorded as NAN, '(?)' or '' in the traces.
+        % As the call via RPC will be recorded twice in MS_CallGraph_Table, 
+        % some metrics related to rpcID could be found from another record even if one is missing.
+        um_is_entry_service = related_entries((strcmp(related_entries.rpcid,'0.1') & strcmp(related_entries.um,'(?)')),:);
+        related_entries.um(um_is_entry_service) = {entry_service_id};
         asCells{i} = table2cell(related_entries);
     end
 
