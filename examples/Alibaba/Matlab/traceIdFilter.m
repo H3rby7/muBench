@@ -24,7 +24,11 @@ function traceIdFilter(data, ~, intermKVStore, entry_service_id)
         
         % filter unusable 'dm' and 'um' lengths
         related_entries = related_entries(cellfun(@dm_um_filter,related_entries.dm, related_entries.um),:);
-        asCells{i} = table2cell(related_entries);
+        
+        % Be unique by rpcid
+        [~, idx] = unique(related_entries.rpcid);
+
+        asCells{i} = table2cell(related_entries(idx,:));
     end
 
     addmulti(intermKVStore, trace_ids, asCells);
