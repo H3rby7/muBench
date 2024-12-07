@@ -10,7 +10,7 @@ function traceIdFilter(data, ~, intermKVStore, entry_service_id)
 
     for i=1:height(trace_ids)
         traceid = trace_ids(i);
-        related_entries = data((strcmp(data.traceid,traceid)>0),:);
+        related_entries = data((strcmp(data.traceid,traceid)>0 & cellfun(@length,data.dm) == 64),:);
         asCells{i} = table2cell(related_entries);
     end
 
