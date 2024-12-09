@@ -1,6 +1,5 @@
 function [T] = emptyTraceTable()
-    varnames = {'Var1', 'traceid', 'timestamp', 'rpcid', 'um', 'rpctype', 'dm', 'interface', 'rt'};
-    vartypes = {'uint64', 'string', 'uint32', 'string', 'string', 'string', 'string', 'string', 'int16'};
-    T = table('Size', [0 9], 'VariableTypes',vartypes, 'VariableNames',varnames);
+    [~, ~, trace_header, trace_vartypes, ~, ~] = config();
+    T = table('Size', [0 9], 'VariableTypes',trace_vartypes, 'VariableNames',trace_header);
 end
 % testme = emptyTraceTable();
