@@ -13,22 +13,14 @@ function [v_G_app,u_services_a,u_traceids_a] = app_graphs(v_G_serv,u_services,u_
     
     s_Matrix = zeros(length(u_services),length(u_services));
     for i = 1:length(v_G_serv)
-        % service1 = u_services{i};
-        nodes1= v_G_serv{i}.Nodes;
-        if height(nodes1) == 0
-            continue;
-        end
+        service1 = u_services{i};
+        nodes1= v_G_serv{i}.Nodes.Name;
         for j = i+1:length(v_G_serv)
-            nodes2= v_G_serv{j}.Nodes;
-            if height(nodes2) == 0
-                continue;
-            end
-            % service2 = u_services{j};
-            names1 = nodes1.Name;
-            names2 = nodes2.Name;
-            common = sum(ismember(names1, names2));
+            nodes2= v_G_serv{j}.Nodes.Name;
+            service2 = u_services{j};
+            common = sum(ismember(nodes1,nodes2));
             %fprintf("%d, %d common %d\n",i,j,common);
-            if(common>sharingT*length(names1) && common>sharingT*length(names2))
+            if(common>sharingT*length(nodes1) && common>sharingT*length(nodes2))
               s_Matrix(i,j)=1;
               s_Matrix(j,i)=1;
             end
