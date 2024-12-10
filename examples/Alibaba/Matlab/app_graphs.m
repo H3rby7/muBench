@@ -1,26 +1,26 @@
 
-function [app_graphs] = app_graphs(graphs,sharingT,napps)
+function [apps] = app_graphs(services,sharingT,napps)
     % an app is a set of "similar" services. Grouping performed according to the paper https://ieeexplore.ieee.org/abstract/document/9774016 
     % v_G_app{i} dependency graph of app #i
     % u_service_a{i} set of services that belongs to app #i
     % u_traceids_a{i} set of traces that belongs to app #i
-    % graphs as returned by 'service_graphs' (cell with 3 columns)
-    % Col1 -> u_services{i} service name of service #i
-    % Col2 -> u_traceids{i} set of traces of service #i
-    % Col3 -> v_G_serv{i} dependency graph of service{i}
+    % services as returned by 'service_graphs' with these columns:
+    % service: ID of the service ('interface')
+    % trace_ids: list of trace_id that correspond to that service
+    % graph: a digraph constructed using the available traces' upstream and downstream information
     % sharingT sharing threshold to declare two services as similar
     % napps number of applications to be generated, if <=0 then this number is computed as in the paper 
     
-    service_digraphs = graphs(:,3);
+    h_services = height(services);
     
-    similarity_matrix = zeros(length(graphs),length(graphs));
-    for i = 1:length(service_digraphs)
-        nodes1= service_digraphs{i}.Nodes;
+    similarity_matrix = zeros(h_services,h_services);
+    for i = 1:h_services
+        nodes1= services.graph{i}.Nodes;
         if height(nodes1) == 0
             continue;
         end
-        for j = i+1:length(service_digraphs)
-            nodes2= service_digraphs{j}.Nodes;
+        for j = i+1:h_services
+            nodes2= services.graph{j}.Nodes;
             if height(nodes2) == 0
                 continue;
             end
@@ -48,13 +48,15 @@ function [app_graphs] = app_graphs(graphs,sharingT,napps)
         % App Number
         app_graphs{i,1} = i;
         % Related Trace IDs
-        app_graphs{i,2} = cat(1, graphs{service_idx,2});
+        app_graphs{i,2} = cat(1, services.trace_ids{service_idx});
         % Related Services
-        app_graphs{i,3} = cat(1, graphs{service_idx,1});
+        app_graphs{i,3} = cat(1, services.service{service_idx});
         % App graph
-        related_svc_digraphs = service_digraphs{service_idx,1};
+        related_svc_digraphs = services.graph{service_idx};
         app_graphs{i,4} = digraph(related_svc_digraphs.Edges);
     end
+
+    apps = cell2table(app_graphs, "VariableNames", ["app_nr", "trace_ids", "service_ids", "graph"]);
 end
 
         

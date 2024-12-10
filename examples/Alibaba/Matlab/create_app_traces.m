@@ -1,11 +1,11 @@
-function [app_traces] = create_app_traces(a_graphs,sanitized_traces)
+function [app_traces] = create_app_traces(apps,sanitized_traces)
     % v_G_app{i} graph of app #i
     % u_trace_ids_a service of app #i
     % Alibaba sanitized traces
     % app_traces{i} is a table that contains the subset of traces of the app #i
-    u_trace_ids_a = a_graphs(:,2);
-    u_services_a = a_graphs(:,3);
-    v_G_app = a_graphs(:,4);
+    u_trace_ids_a = apps.trace_ids;
+    u_services_a = apps.service_ids;
+    v_G_app = apps.graph;
 
     app_traces=cell(length(v_G_app),1);
     for i=1:length(v_G_app)

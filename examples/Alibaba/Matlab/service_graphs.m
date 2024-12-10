@@ -1,4 +1,4 @@
-function [service_graphs] = service_graphs(sanitized_traces)
+function [services] = service_graphs(sanitized_traces)
     % v_G_serv{i} is the graph of a service where a service is identified by the interface name of the first call
     % services{i} interface name of the service i-th
     % trace_ids_by_service{i} set of trace_ids that regards service i-th
@@ -11,10 +11,10 @@ function [service_graphs] = service_graphs(sanitized_traces)
     interfaces = unique(sanitized_traces.interface(trace_rpc_ids_0_idx,:));
     l_interfaces = length(interfaces);
 
-    % service_graph will be a cell array with 3 columns
-    % Col1: ID of the service ('interface')
-    % Col2: trace_ids that correspond to that service
-    % Col3: a digraph constructed using the available traces' upstream and downstream information
+    % service_graph will be a table with these columns:
+    % service: ID of the service ('interface')
+    % trace_ids: list of trace_id that correspond to that service
+    % graph: a digraph constructed using the available traces' upstream and downstream information
     service_graphs = cell(l_interfaces,3);
 
     for i = 1:l_interfaces
@@ -33,6 +33,7 @@ function [service_graphs] = service_graphs(sanitized_traces)
         service_graphs{i,3} = digraph(trace_g.upstream_ms', trace_g.downstream_ms');
     end
 
+    services = cell2table(service_graphs, "VariableNames", ["service", "trace_ids", "graph"]);
 end
     
     
