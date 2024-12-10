@@ -1,4 +1,4 @@
-function [app_traces] = create_app_traces(v_G_app,u_trace_ids_a,sanitized_traces)
+function [app_traces] = create_app_traces_orig(v_G_app,u_trace_ids_a,sanitized_traces)
     % v_G_app{i} graph of app #i
     % u_trace_ids_a service of app #i
     % Alibaba sanitized traces
