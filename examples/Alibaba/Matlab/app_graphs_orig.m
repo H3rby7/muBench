@@ -1,20 +1,15 @@
 
-function [v_G_app,u_services_a,u_traceids_a] = app_graphs(graphs,sharingT,napps)
+function [v_G_app,u_services_a,u_traceids_a] = app_graphs_orig(v_G_serv,u_services,u_traceids,sharingT,napps)
     % an app is a set of "similar" services. Grouping performed according to the paper https://ieeexplore.ieee.org/abstract/document/9774016 
     % v_G_app{i} dependency graph of app #i
     % u_service_a{i} set of services that belongs to app #i
     % u_traceids_a{i} set of traces that belongs to app #i
-    % graphs as returned by 'service_graphs' (cell with 3 columns)
-    % Col1 -> u_services{i} service name of service #i
-    % Col2 -> u_traceids{i} set of traces of service #i
-    % Col3 -> v_G_serv{i} dependency graph of service{i}
+    % v_G_serv{i} dependency graph of service{i}
+    % u_services{i} service name of service #i
+    % u_traceids{i} set of traces of service #i
     % sharingT sharing threshold to declare two services as similar
     % napps number of applications to be generated, if <=0 then this number is computed as in the paper 
     
-    % Original Code (port)
-    u_services = graphs(:,1);
-    u_traceids = graphs(:,2);
-    v_G_serv = graphs(:,3);
     
     s_Matrix = zeros(length(u_services),length(u_services));
     for i = 1:length(v_G_serv)
