@@ -1,20 +1,19 @@
-function [app_traces] = create_app_traces(v_G_app,u_trace_ids_a,sanitized_traces)
+function [app_traces] = create_app_traces(a_graphs,sanitized_traces)
     % v_G_app{i} graph of app #i
     % u_trace_ids_a service of app #i
     % Alibaba sanitized traces
     % app_traces{i} is a table that contains the subset of traces of the app #i
-    
+    u_trace_ids_a = a_graphs(:,2);
+    u_services_a = a_graphs(:,3);
+    v_G_app = a_graphs(:,4);
+
     app_traces=cell(length(v_G_app),1);
     for i=1:length(v_G_app)
-        app_traces{i} = table();
-        for j=1:length(u_trace_ids_a{i})
-            trace_id = u_trace_ids_a{i}(j);
-            trace_id_idx_1 = strcmp(sanitized_traces.trace_id,trace_id)>0;
-            app_traces{i,:} = [app_traces{i,:};sanitized_traces(trace_id_idx_1,:)];
-        end
+        app_traces{i} = sanitized_traces(ismember(sanitized_traces.trace_id, unique(u_trace_ids_a{i})),:);
 
         % trace/app check
         ms = unique([app_traces{i}.upstream_ms ; app_traces{i}.downstream_ms]);
+
         u_ms_length = length(ms)-1;
         numnodes = v_G_app{i}.numnodes;
         if (u_ms_length ~= numnodes)
@@ -35,6 +34,7 @@ function [app_traces] = create_app_traces(v_G_app,u_trace_ids_a,sanitized_traces
                 end
                 cmp{j,2} = nodes_sorted{j};
             end
+            related_trace = sanitized_traces(ismember(sanitized_traces.trace_id, unique(app_traces{i}.trace_id)),:);
             cmp
         end
         
