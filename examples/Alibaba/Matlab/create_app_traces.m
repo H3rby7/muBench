@@ -14,7 +14,7 @@ function [app_traces] = create_app_traces(v_G_app,u_trace_ids_a,sanitized_traces
 
         % trace/app check
         ms = unique([app_traces{i}.upstream_ms ; app_traces{i}.downstream_ms]);
-        if (length(ms)-1 ~= v_G_app{i}.numnodes)
+        if (length(ms) ~= v_G_app{i}.numnodes)
             fprintf('Warning trace %d not consistent with app graph',i);
         end
         
