@@ -46,10 +46,7 @@ try:
     else:
         output_file = "workmodel.json"
     
-    if "ServiceMeshFilePath" in workmodel_parameters.keys():
-        # backward compatibility
-        servicegraph_file_path = workmodel_parameters["ServiceMeshFilePath"]["value"]
-    elif "ServiceGraphFilePath" in workmodel_parameters.keys():
+    if "ServiceGraphFilePath" in workmodel_parameters.keys():
         servicegraph_file_path = workmodel_parameters["ServiceGraphFilePath"]["value"]
     else:
         servicegraph_file_path = f"{output_path}/servicegraph.json"
