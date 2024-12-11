@@ -79,8 +79,8 @@ function [apps, services] = app_graphs(services,sanitized_traces,sharingT,napps)
         numnodes = app_graphs{i,4}.numnodes;
         if (u_ms_length ~= numnodes)
             fprintf('Warning: App %d -> traces not consistent with service graph\n', i);
-            nodenames = app_graphs{i,4}.Nodes.Name
-            ms
+            % nodenames = app_graphs{i,4}.Nodes.Name
+            % ms
         end
     end
 

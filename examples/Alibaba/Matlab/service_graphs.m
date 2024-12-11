@@ -38,8 +38,8 @@ function [services] = service_graphs(sanitized_traces)
         numnodes = service_graphs{i,3}.numnodes;
         if (u_ms_length ~= numnodes)
             fprintf('Warning: Service %s -> traces not consistent with service graph\n', interface);
-            nodenames = service_graphs{i,3}.Nodes.Name
-            ms
+            % nodenames = service_graphs{i,3}.Nodes.Name
+            % ms
         end
     end
 
