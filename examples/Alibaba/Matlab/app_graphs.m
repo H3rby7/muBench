@@ -44,8 +44,9 @@ function [apps, services] = app_graphs(services,sanitized_traces,sharingT,napps)
     clusters = spectralcluster(similarity_matrix,napps);
     app_graphs = cell(napps,4);
 
-    % append a column to hold the corresponding app
-    services{:,4} = 0;
+    % append a column to the services table 
+    % to hold the corresponding app (cluster)
+    services = [services table(clusters)];
     services.Properties.VariableNames(4) = "app";
 
     for i=1:napps
@@ -55,36 +56,34 @@ function [apps, services] = app_graphs(services,sanitized_traces,sharingT,napps)
         % App Number
         app_graphs{i,1} = i;
         % Related Trace IDs
-        app_graphs{i,2} = cat(1, services.trace_ids{service_idx});
+        related_trace_ids = cat(1, services.trace_ids{service_idx});
+        app_graphs{i,2} = sanitized_traces(ismember(sanitized_traces.trace_id, related_trace_ids),:);
         % Related Services
         app_graphs{i,3} = cat(1, services.service{service_idx});
         % App graph
 
+        % Get edges of services.graphs
         edges_table = rowfun(@getGraphEdges, ...
                            services(service_idx,:), ...
                            "InputVariables","graph", ...
                            "OutputVariableNames","edges", ...
                            "OutputFormat", "table");
         edges = vertcat(edges_table.edges{:});
-        
-        % TODO: here the syntax fails and only saves one digraph
-        % Also if this is a cell of 2 digraphs, accessing them via .Edges
-        % is not working.
+
+        % construct 'app' graph by using the services.graphs edges
         app_graphs{i,4} = digraph(edges);
 
-        % Sanity Check
-        trace_g = sanitized_traces(ismember(sanitized_traces.trace_id, unique(app_graphs{i,2})),:);
-        ms = unique([trace_g.upstream_ms ; trace_g.downstream_ms]);
-        u_ms_length = length(ms);
-        numnodes = app_graphs{i,4}.numnodes;
-        if (u_ms_length ~= numnodes)
-            fprintf('Warning: App %d -> traces not consistent with service graph\n', i);
+        % Verify result
+        ms_from_trace = unique([app_graphs{i,2}.upstream_ms ; app_graphs{i,2}.downstream_ms]);
+        ms_count_graph = app_graphs{i,4}.numnodes;
+        if (length(ms_from_trace) ~= ms_count_graph)
+            fprintf('Warning: MS count for App %d -> count of MS in app graph and count of MS from trace differ!\n', i);
             % nodenames = app_graphs{i,4}.Nodes.Name
-            % ms
+            % ms_from_trace
         end
     end
 
-    apps = cell2table(app_graphs, "VariableNames", ["app_nr", "trace_ids", "service_ids", "graph"]);
+    apps = cell2table(app_graphs, "VariableNames", ["app_nr", "traces", "service_ids", "graph"]);
 end
 
 function [edges] = getGraphEdges(graph)

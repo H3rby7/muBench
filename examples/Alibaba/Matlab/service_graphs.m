@@ -33,13 +33,12 @@ function [services] = service_graphs(sanitized_traces)
         service_graphs{i,3} = digraph(trace_g.upstream_ms', trace_g.downstream_ms');
 
         % Sanity Check
-        ms = unique([trace_g.upstream_ms ; trace_g.downstream_ms]);
-        u_ms_length = length(ms);
-        numnodes = service_graphs{i,3}.numnodes;
-        if (u_ms_length ~= numnodes)
-            fprintf('Warning: Service %s -> traces not consistent with service graph\n', interface);
+        ms_from_trace = unique([trace_g.upstream_ms ; trace_g.downstream_ms]);
+        ms_count_graph = service_graphs{i,3}.numnodes;
+        if (length(ms_from_trace) ~= ms_count_graph)
+            fprintf('Warning: MS count for Service %s -> count of MS in service graph and count of MS from trace differ!\n', interface);
             % nodenames = service_graphs{i,3}.Nodes.Name
-            % ms
+            % ms_from_trace
         end
     end
 
