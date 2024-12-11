@@ -1,5 +1,5 @@
 
-function [apps] = app_graphs(services,sharingT,napps)
+function [apps, services] = app_graphs(services,sanitized_traces,sharingT,napps)
     % an app is a set of "similar" services. Grouping performed according to the paper https://ieeexplore.ieee.org/abstract/document/9774016 
     % v_G_app{i} dependency graph of app #i
     % u_service_a{i} set of services that belongs to app #i
@@ -43,8 +43,15 @@ function [apps] = app_graphs(services,sharingT,napps)
     end
     clusters = spectralcluster(similarity_matrix,napps);
     app_graphs = cell(napps,4);
+
+    % append a column to hold the corresponding app
+    services{:,4} = 0;
+    services.Properties.VariableNames(4) = "app";
+
     for i=1:napps
         service_idx = (clusters==i); %services idx of the cluster/app
+        % add column
+        services{service_idx,4} = i;
         % App Number
         app_graphs{i,1} = i;
         % Related Trace IDs
@@ -52,13 +59,35 @@ function [apps] = app_graphs(services,sharingT,napps)
         % Related Services
         app_graphs{i,3} = cat(1, services.service{service_idx});
         % App graph
-        related_svc_digraphs = services.graph{service_idx};
-        app_graphs{i,4} = digraph(related_svc_digraphs.Edges);
+
+        edges_table = rowfun(@getGraphEdges, ...
+                           services(service_idx,:), ...
+                           "InputVariables","graph", ...
+                           "OutputVariableNames","edges", ...
+                           "OutputFormat", "table");
+        edges = vertcat(edges_table.edges{:});
+        
+        % TODO: here the syntax fails and only saves one digraph
+        % Also if this is a cell of 2 digraphs, accessing them via .Edges
+        % is not working.
+        app_graphs{i,4} = digraph(edges);
+
+        % Sanity Check
+        trace_g = sanitized_traces(ismember(sanitized_traces.trace_id, unique(app_graphs{i,2})),:);
+        ms = unique([trace_g.upstream_ms ; trace_g.downstream_ms]);
+        u_ms_length = length(ms);
+        numnodes = app_graphs{i,4}.numnodes;
+        if (u_ms_length ~= numnodes)
+            fprintf('Warning: App %d -> traces not consistent with service graph\n', i);
+            nodenames = app_graphs{i,4}.Nodes.Name
+            ms
+        end
     end
 
     apps = cell2table(app_graphs, "VariableNames", ["app_nr", "trace_ids", "service_ids", "graph"]);
 end
 
-        
-    
-    
+function [edges] = getGraphEdges(graph)
+    % Return edges of the graph in a cell
+    edges = {graph{:}.Edges};
+end

@@ -31,6 +31,16 @@ function [services] = service_graphs(sanitized_traces)
         % Create directed graph
         % using the trace upstream and downstream combinations to describe its edges
         service_graphs{i,3} = digraph(trace_g.upstream_ms', trace_g.downstream_ms');
+
+        % Sanity Check
+        ms = unique([trace_g.upstream_ms ; trace_g.downstream_ms]);
+        u_ms_length = length(ms);
+        numnodes = service_graphs{i,3}.numnodes;
+        if (u_ms_length ~= numnodes)
+            fprintf('Warning: Service %s -> traces not consistent with service graph\n', interface);
+            nodenames = service_graphs{i,3}.Nodes.Name
+            ms
+        end
     end
 
     services = cell2table(service_graphs, "VariableNames", ["service", "trace_ids", "graph"]);

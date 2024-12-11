@@ -13,10 +13,10 @@ function [app_traces] = create_app_traces(apps,sanitized_traces)
         % trace/app check
         ms = unique([app_traces{i}.upstream_ms ; app_traces{i}.downstream_ms]);
 
-        u_ms_length = length(ms)-1;
+        u_ms_length = length(ms);
         numnodes = apps.graph{i}.numnodes;
         if (u_ms_length ~= numnodes)
-            fprintf('Warning trace %d not consistent with app graph',i);
+            fprintf('Warning: App %d -> trace not consistent with app graph',i);
             m = max([height(ms); height(apps.graph{i}.Nodes.Name)]);
             cmp = cell(m,2);
             ms_sorted = sort(ms);
