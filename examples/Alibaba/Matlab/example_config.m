@@ -21,7 +21,7 @@ function [trace_location, trace_header_lines, trace_header, trace_vartypes, entr
 
     % *************** Directories for output ***************
     % convenient variable, does not get exported.
-    output_dir_root = "traces-mbench";
+    output_dir_root = "../traces-mbench";
     % DIR within root DIR to hold sequential output
     output_dir_sequential = output_dir_root+"/sequential";
     % DIR within root DIR to hold parallel output
