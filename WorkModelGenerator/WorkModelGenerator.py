@@ -1,13 +1,16 @@
 import random
 import os
+import logging
 
 WORKMODEL_PATH = os.path.dirname(os.path.abspath(__file__))
+logger = logging.getLogger(__name__)
 
 
 # Select exactly one service function according to the probability
 # Get in INPUT the list with the internal-service functions
-def select_internal_service(internal_services):
+def select_internal_service(service_name, internal_services):
     internal_service_items = internal_services.items()
+    logger.debug(f'Selecting internal service for service "{service_name}" from [{internal_services.keys()}]')
     random_extraction = random.random()
     # print("Extraction: %.4f" % random_extraction)
     p_total = 0.0
@@ -17,21 +20,31 @@ def select_internal_service(internal_services):
     prev_interval = 0
     for k in internal_services.keys():
         if random_extraction <= prev_interval + internal_services[k]["probability"]/p_total:
-            function_id = k       
+            function_id = k
+            logger.debug(f'Selected "{k}" as internal service for service "{service_name}"')
             return function_id
         prev_interval += round(internal_services[k]["probability"]/p_total, 10)
+    logger.warning(f'Could not find an internal service for service "{service_name}"')
 
 
 def get_work_model(service_graph, workmodel_params):
     work_model = dict()
     
+    logger.info("*** Settings for get_work_model ***")
+
     if "override" in workmodel_params.keys():
         override = workmodel_params["override"]["value"]
     else:
         override = dict()
     
+    logger.info("Overrides:")
+    for o in override:
+        logger.info(o)
+    
     request_method = workmodel_params["request_method"]["value"]
+    logger.info(f'request_method: {request_method}')
     databases_prefix = workmodel_params["databases_prefix"]["value"]
+    logger.info(f'databases_prefix: {databases_prefix}')
 
     internal_services = dict()
     internal_services_db = dict()
@@ -65,30 +78,39 @@ def get_work_model(service_graph, workmodel_params):
             internal_services[k]=dict()
             internal_services[k].update({"string" : tmp_dict})
             internal_services[k].update({"probability": w["value"]["probability"]})
+        logger.info(f'Adding function ({k}):')
+        for o in override:
+            logger.info(o)
     
     if len(internal_services_db) == 0:
+        logger.info("No internal DB services specified, using fallback.")
         # in case internal services for databases wer not specified, those for plain service are used
         internal_services_db = internal_services
     try:
+        logger.info(f'Processing service_graph')
         for vertex in service_graph.keys():
+            logger.debug(f'Processing service "{vertex}"')
             work_model[f"{vertex}"] = {'external_services':service_graph.get(vertex)['external_services']}
             
             if vertex.startswith(databases_prefix):
-                selected_internal_service = select_internal_service(internal_services_db)
+                selected_internal_service = select_internal_service(vertex, internal_services_db)
                 work_model[f"{vertex}"].update(internal_services_db[selected_internal_service]['string'])
             else:
-                selected_internal_service = select_internal_service(internal_services)
+                selected_internal_service = select_internal_service(vertex, internal_services)
                 work_model[f"{vertex}"].update(internal_services[selected_internal_service]['string'])
             
             if vertex in override.keys():
+                logger.info(f'Service "{vertex}" has overrides')
                 if "sidecar" in override[vertex].keys():
+                    logger.debug(f'Overriding sidecar for service "{vertex}"')
                     work_model[f"{vertex}"].update({"sidecar": override[vertex]["sidecar"]})
                 if "function_id" in override[vertex].keys():
+                    logger.debug(f'Overriding function_id for service "{vertex}"')
                     work_model[f"{vertex}"].update(internal_services[override[vertex]['function_id']]['string'])
 
     except Exception as err:
-        print("ERROR: in get_work_model,", err)
+        logger.critical("ERROR: in get_work_model: %s", err)
         exit(1)
     
-    print("Work Model Created!")
+    logger.info("Work Model Created!")
     return work_model
