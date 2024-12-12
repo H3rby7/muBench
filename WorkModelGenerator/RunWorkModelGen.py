@@ -4,6 +4,8 @@ from pprint import pprint
 import sys
 import os
 import shutil
+import logging
+logger = logging.getLogger(__name__)
 
 import argparse
 import argcomplete
@@ -13,6 +15,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('-c', '--config-file', action='store', dest='parameters_file',
                     help='The WorkModel Parameters file', default=f'{WORKMODEL_PATH}/WorkModelParameters.json')
+parser.add_argument('-l', '--log', action='store', dest='log_level', help='log level', default='warn')
 
 argcomplete.autocomplete(parser)
 
@@ -25,6 +28,11 @@ except AttributeError:
     parser.print_help()
 except Exception as err:
     print("Error:", err)
+
+numeric_level = getattr(logging, args.log_level.upper(), None)
+if not isinstance(numeric_level, int):
+    raise ValueError('Invalid log level: %s' % args.log_level)
+logging.basicConfig(level=numeric_level)
 
 parameters_file_path = args.parameters_file
 
