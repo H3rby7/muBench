@@ -1,55 +1,48 @@
-function [v_G_serv,u_services,u_traceids] = service_graphs(sanitized_traces)
+function [services] = service_graphs(sanitized_traces)
     % v_G_serv{i} is the graph of a service where a service is identified by the interface name of the first call
-    % u_services{i} interface name of the service i-th
-    % u_traceids{i} set of traceids that regards service i-th
+    % services{i} interface name of the service i-th
+    % trace_ids_by_service{i} set of trace_ids that regards service i-th
     % sanitized_trace, Alibaba trace sanitized 
     
-    v_G_serv = {}; % graphs of services, a service is identified by the interface name of the first call
-    trace_id_idx_1 = find(strcmp(sanitized_traces.rpcid,"0")>0);
-    services = cell(sanitized_traces.interface(trace_id_idx_1));
-    trace_ids = cell(sanitized_traces.traceid(trace_id_idx_1));
-    u_services = unique(services);  % unique service id
-    u_traceids = cell(length(u_services),1); % trace id of the services
-    for i=1:length(u_services)
-        u_traceids{i} = strings(0);
-        v_G_serv{i} = digraph();
-    end
-    l = length(trace_ids);
-    for i = 1:l
-        service = services{i};
-        traceid = trace_ids{i};
-        trace_id_idx_1 = find(strcmp(sanitized_traces.traceid,traceid)>0);
-        trace_g = sanitized_traces(trace_id_idx_1,:);
-        u_service_id = find(strcmp(u_services,service),1,'first');
-        u_traceids{u_service_id} = [u_traceids{u_service_id}; traceid];
-        for j = 1 : height(trace_g)
-            
-            % add um,dm nodes
-            if strcmp(trace_g.rpcid{j},'0')
-                continue
-            end
-            um = trace_g.um{j};
-            dm = trace_g.dm{j};
-            % add nodes
-            if numnodes(v_G_serv{u_service_id})==0
-                v_G_serv{u_service_id} = addnode(v_G_serv{u_service_id},um);
-            elseif not(findnode(v_G_serv{u_service_id},um))
-                v_G_serv{u_service_id} = addnode(v_G_serv{u_service_id},um);
-            end
-            if not(findnode(v_G_serv{u_service_id},dm))
-                v_G_serv{u_service_id} = addnode(v_G_serv{u_service_id},dm);
-            end
-            % add edges
-            v_G_serv{u_service_id} = addedge(v_G_serv{u_service_id},um,dm); % add one edge x call
-%             if strcmp(um,dm)
-%                 %skip autocall
-%                 continue
-%             end
-%             if findedge(v_G_serv{u_service_id},um,dm) == 0
-%                 v_G_serv{u_service_id} = addedge(v_G_serv{u_service_id},um,dm); % add one edge x call
-%             end
+    % all trace entries, where rpc_id = '0'
+    trace_rpc_ids_0_idx = strcmp(sanitized_traces.rpc_id,"0")>0;
+
+    % extract interface property as unique list -> these will represent a 'service'
+    interfaces = unique(sanitized_traces.interface(trace_rpc_ids_0_idx,:));
+    l_interfaces = length(interfaces);
+
+    % service_graph will be a table with these columns:
+    % service: ID of the service ('interface')
+    % trace_ids: list of trace_id that correspond to that service
+    % graph: a digraph constructed using the available traces' upstream and downstream information
+    service_graphs = cell(l_interfaces,3);
+
+    for i = 1:l_interfaces
+        interface = interfaces{i};
+        service_graphs{i,1} = interface;
+
+        % trace_ids that have this service/interface as root (rpc_id=='0')
+        related_trace_ids = unique(sanitized_traces.trace_id((strcmp(sanitized_traces.interface,interface)>0) & trace_rpc_ids_0_idx,:));
+        service_graphs{i,2} = related_trace_ids;
+
+        % trace_g = all trace entries of the related_trace_ids
+        trace_g = sanitized_traces(ismember(sanitized_traces.trace_id, related_trace_ids),:);
+
+        % Create directed graph
+        % using the trace upstream and downstream combinations to describe its edges
+        service_graphs{i,3} = digraph(trace_g.upstream_ms', trace_g.downstream_ms');
+
+        % Sanity Check
+        ms_from_trace = unique([trace_g.upstream_ms ; trace_g.downstream_ms]);
+        ms_count_graph = service_graphs{i,3}.numnodes;
+        if (length(ms_from_trace) ~= ms_count_graph)
+            fprintf('Warning: MS count for Service %s -> count of MS in service graph and count of MS from trace differ!\n', interface);
+            % nodenames = service_graphs{i,3}.Nodes.Name
+            % ms_from_trace
         end
     end
+
+    services = cell2table(service_graphs, "VariableNames", ["service", "trace_ids", "graph"]);
 end
     
     

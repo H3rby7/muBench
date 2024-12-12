@@ -1,11 +1,14 @@
 % all-in-one script to create app and app trace for µBench starting from
 % Alibaba MSCallGraph (https://github.com/alibaba/clusterdata/blob/master/cluster-trace-microservices-v2021/README.md)
 
-alibaba_trace = "MSCallGraph_0.csv";
+% alibaba_trace = "MSCallGraph_0.csv";
+alibaba_trace = "../../../../../traces/alibaba/2021-ms/MSCallGraph/MSCallGraph_test.csv";
 callg=readtable(alibaba_trace);
 
 % extract 20000 complete traces
+tic
 [sanitized_traces,v_G_sub] = trace_sanity(callg,20000)
+toc
 
 % extract services
 [v_G_serv,u_services,u_traceids] = service_graphs(sanitized_traces);
