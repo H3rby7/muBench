@@ -28,16 +28,24 @@ trace = table(Nr, trace_id, timestamp, rpc_id, upstream_ms, rpc_type, downstream
 %       |_ [calls self]
 %       |_ 9653f5baba69c9fb50bfb30a8571eb04dbceaae7c7f379e20bd73a41168a2913
 %       |_ 9ee59483550ea795bc04e930ad6b37b7852e92fa9a71556565e91380dd39de03
+tic
+str_json_par = get_trace_string_json(trace, true);
+str_json_seq = get_trace_string_json(trace, false);
+toc
 
-
-par_json = get_trace_json(trace, true);
-seq_json = get_trace_json(trace, false);
-
+tic
+par_json = get_trace_json(trace, true, false);
+seq_json = get_trace_json(trace, false, false);
+toc
 
 fprintf("digraph+jsonencode PARALLEL:\n");
 disp(par_json);
+fprintf("digraph+str PARALLEL:\n");
+disp(str_json_par);
 fprintf("digraph+jsonencode SEQUENTIAL:\n");
 disp(seq_json);
+fprintf("digraph+str SEQUENTIAL:\n");
+disp(str_json_seq);
 
 % fprintf("string concat");
 % tic
