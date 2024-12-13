@@ -23,7 +23,7 @@ function [t_struct] = rec(digraph, node_name)
     children = digraph.successors(node_name);
     key = ['o_' node_name];
     if isempty(children)
-        c_nodes = [];
+        c_nodes = {[struct()]};
     else
         c_nodes = cellfun(@(c) rec(digraph, c), children, 'UniformOutput',false);
     end
