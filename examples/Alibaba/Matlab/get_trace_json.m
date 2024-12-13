@@ -21,9 +21,13 @@ end
 
 function [t_struct] = rec(digraph, node_name)
     children = digraph.successors(node_name);
-    key = "o_"+convertCharsToStrings(node_name);
-    c_nodes = cellfun(@(c) rec(digraph, c), children, 'UniformOutput',false);
-    t_struct = struct(key,c_nodes);
+    key = ['o_' node_name];
+    if isempty(children)
+        c_nodes = [];
+    else
+        c_nodes = cellfun(@(c) rec(digraph, c), children, 'UniformOutput',false);
+    end
+    t_struct = struct(key,{c_nodes});
     % t_struct = struct(['o_' node_name],arrayfun(@(c) rec(digraph, c), children));
 end
 
