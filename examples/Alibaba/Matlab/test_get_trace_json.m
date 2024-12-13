@@ -21,17 +21,6 @@ interface = ["1f888de4377607e9402377e6ab0e83cc3c542b95e9c2133caa7e29e2028796a0";
 response_time = [-8; -4; 1; 0; 0];
 
 trace = table(Nr, trace_id, timestamp, rpc_id, upstream_ms, rpc_type, downstream_ms, interface, response_time);
-
-
-fprintf("digraph+jsonencode PARALLEL");
-tic
-get_trace_json(trace, true)
-toc
-
-fprintf("digraph+jsonencode SEQUENTIAL");
-tic
-get_trace_json(trace, false)
-toc
 % Structure of trace is:
 % synthetic_id_as_the_upstream_of_this_trace_entry_is_the_end_user
 % |_ 7695b43b41732a0f15d3799c8eed2852665fe8da29fd700c383550fc16e521a3
@@ -39,6 +28,16 @@ toc
 %       |_ [calls self]
 %       |_ 9653f5baba69c9fb50bfb30a8571eb04dbceaae7c7f379e20bd73a41168a2913
 %       |_ 9ee59483550ea795bc04e930ad6b37b7852e92fa9a71556565e91380dd39de03
+
+
+par_json = get_trace_json(trace, true);
+seq_json = get_trace_json(trace, false);
+
+
+fprintf("digraph+jsonencode PARALLEL:\n");
+disp(par_json);
+fprintf("digraph+jsonencode SEQUENTIAL:\n");
+disp(seq_json);
 
 % fprintf("string concat");
 % tic
