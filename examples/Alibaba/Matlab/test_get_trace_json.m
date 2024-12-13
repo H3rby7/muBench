@@ -36,9 +36,9 @@ toc
 %       |_ 9653f5baba69c9fb50bfb30a8571eb04dbceaae7c7f379e20bd73a41168a2913
 %       |_ 9ee59483550ea795bc04e930ad6b37b7852e92fa9a71556565e91380dd39de03
 
-fprintf("string concat");
-tic
-involved_ms = unique([trace.upstream_ms ; trace.downstream_ms]);
-concatted = get_json_mubench('0.1',trace,involved_ms,0)
-toc
-jsonencode(jsondecode("{"+concatted+"}"), "PrettyPrint",true)
+% fprintf("string concat");
+% tic
+% involved_ms = unique([trace.upstream_ms ; trace.downstream_ms]);
+% concatted = get_json_mubench('0.1',trace,involved_ms,0)
+% toc
+% jsonencode(jsondecode("{"+concatted+"}"), "PrettyPrint",true)
