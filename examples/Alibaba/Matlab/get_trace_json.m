@@ -1,10 +1,10 @@
-function [json] = get_trace_json(trace, parallel)
-    % brain help for output format:
-    % it is always { and [ in sequence -> e.g. [{[{[{}]}]}] 
-    % In any case we have our MS and next an array: []
-    % if its parallel, we add one {} per call
-    % if its sequential we add the calls to the same {}
-    % all entries in the array are executed in parallel
+function [json] = get_trace_json(trace, parallel, prettyPrint)
+    % Convert a sanitized trace for a trace_id to an muBench conformous
+    % json textz output
+    % trace - The input trace
+    % parallel = 1 - Sibiling calls executed in parallel (e.g. 0.1 calls 0.1.1 and 0.1.2 in parallel)
+    % prettyPrint - formatting option for jsonencode
+    % json - the output string
     [~, ~, ~, ~, entry_service_id, ~, ~, ~] = config();
 
     trace = sortrows(trace, 'rpc_id', 'asc');
@@ -16,14 +16,16 @@ function [json] = get_trace_json(trace, parallel)
     % structure for parallel, for sequential can reduce array items into
     % struct later on.
 
-    json = jsonencode(t_struct);
+    json = jsonencode(t_struct, PrettyPrint=prettyPrint);
     if ~parallel
         %replace all '},{' with ','
-        json = replace(json, "},{", ",");
+        json = regexprep(json, "\]\n\s*\},\n\s*\{", "],");
     end
 end
 
 function [t_struct] = rec(digraph, node_name)
+    % Recursively iterates over the digraph and creates a struct from it
+    % if json-encoded as-is would be parallel execution.
     children = digraph.successors(node_name);
     key = ['o_' node_name];
     if isempty(children)
