@@ -18,8 +18,11 @@ function [json] = get_trace_json(trace, parallel, prettyPrint)
 
     json = jsonencode(t_struct, PrettyPrint=prettyPrint);
     if ~parallel
-        %replace all '},{' with ','
-        json = regexprep(json, "\]\n\s*\},\n\s*\{", "],");
+        if prettyPrint
+            json = regexprep(json, "\]\n\s*\},\n\s*\{", "],");
+        else
+            json = replace(json, '},{',',');
+        end
     end
 end
 
