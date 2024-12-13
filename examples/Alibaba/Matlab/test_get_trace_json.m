@@ -23,11 +23,15 @@ response_time = [-8; -4; 1; 0; 0];
 trace = table(Nr, trace_id, timestamp, rpc_id, upstream_ms, rpc_type, downstream_ms, interface, response_time);
 
 
-fprintf("digraph+jsonencode");
+fprintf("digraph+jsonencode PARALLEL");
 tic
-get_trace_json(trace)
+get_trace_json(trace, true)
 toc
 
+fprintf("digraph+jsonencode SEQUENTIAL");
+tic
+get_trace_json(trace, false)
+toc
 % Structure of trace is:
 % synthetic_id_as_the_upstream_of_this_trace_entry_is_the_end_user
 % |_ 7695b43b41732a0f15d3799c8eed2852665fe8da29fd700c383550fc16e521a3
