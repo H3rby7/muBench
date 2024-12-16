@@ -142,7 +142,7 @@ dmypy.json
 
 # Alibaba Example
 # Ignore personal config, an example_config.m file is provided to customize.
-examples/Alibaba/Matlab/config.m
-examples/Alibaba/Matlab/results
+examples/Alibaba/Matlab/**/config.m
+examples/Alibaba/Matlab/**/results
 examples/Alibaba/Matlab/traces-mbench
 *.asv
