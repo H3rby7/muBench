@@ -33,17 +33,9 @@ str_json_par = get_trace_string_json(trace, true);
 str_json_seq = get_trace_string_json(trace, false);
 toc
 
-tic
-par_json = get_trace_json(trace, true, false);
-seq_json = get_trace_json(trace, false, false);
-toc
 
-fprintf("digraph+jsonencode PARALLEL:\n");
-disp(par_json);
 fprintf("digraph+str PARALLEL:\n");
 disp(str_json_par);
-fprintf("digraph+jsonencode SEQUENTIAL:\n");
-disp(seq_json);
 fprintf("digraph+str SEQUENTIAL:\n");
 disp(str_json_seq);
 
