@@ -15,5 +15,5 @@ function filter_ms_reducer(ms_name, intermValIter, outKVStore)
         return
     end
 
-    add(outKVStore, ms_name, sortrows(T,'timestamp','ascend'));
+    add(outKVStore, ms_name, sortrows(T,{'ms_instance_id', 'timestamp'},{'ascend', 'ascend'}));
 end
