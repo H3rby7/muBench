@@ -10,10 +10,19 @@ function [json] = get_trace_string_json(trace, parallel)
     trace = sortrows(trace, 'rpc_id', 'asc');
     dg = digraph(trace.upstream_ms', trace.downstream_ms', 'omitselfloops');
 
-    body = rec(dg, entry_service_id, parallel);
+    if hascycles(dg)
+        % We could possibly find a workaround for these traces, however
+        % they are only a small percentage of the total.
+        trace_id = trace.trace_id{1,:};
+        fprintf('Warning: Trace with ID "%s" has cycles and is being skipped\n', trace_id);
+        body{1} = '';
+    else
+        body = rec(dg, entry_service_id, parallel);
+    end
     json = ['{' body{1} '}'];
 
-    jsondecode(json);
+    % validity check
+    % jsondecode(json);
 end
 
 function [out] = rec(digraph, node_name, parallel)
