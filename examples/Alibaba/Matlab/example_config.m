@@ -1,7 +1,7 @@
 % IMPORTANT: This is the example config file!!
 %            Make a copy of this file in this directory and name it 'config.m'!
 
-function [trace_location, trace_header_lines, trace_header, trace_vartypes, entry_service_id, sanitized_trace_count, output_dir_sequential, output_dir_parallel] = config()
+function [trace_location, trace_header_lines, trace_header, trace_vartypes, entry_service_id, sanitized_trace_count, output_dir_sequential, output_dir_parallel, output_dir_root] = config()
     % Adjust the variables in this block to your needs and conditions
 
     % *************** Trace options ***************
