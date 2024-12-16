@@ -10,10 +10,10 @@ function mb_trace_stats = create_app_traces_for_mbench(apps,parallel)
     
     mb_trace_stats = cell(app_count, 1);
     
-    if parallel~=1
-        dir_root = output_dir_sequential;
-    else
+    if parallel
         dir_root = output_dir_parallel;
+    else
+        dir_root = output_dir_sequential;
     end
     
     for t=1:app_count
@@ -25,10 +25,7 @@ function mb_trace_stats = create_app_traces_for_mbench(apps,parallel)
         trace_ids = unique(app_trace.trace_id);
         for i = 1:length(trace_ids)
             single_trace = app_trace((strcmp(app_trace.trace_id,trace_ids(i))>0),:);
-            js="{";
-            js = js+get_json_mubench('0.1',single_trace,parallel);
-            %js = prettyjson(js);
-            js=js+"}";
+            js = get_trace_string_json(single_trace,parallel);
             fid = fopen(working_dir+"/trace"+num2str(i, '%0.5d')+".json",'w');
             fprintf(fid,"%s",js);
             fclose(fid);
