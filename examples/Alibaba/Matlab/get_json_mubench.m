@@ -1,4 +1,4 @@
-function js = get_json_mubench(rpc_id,app_trace,involved_ms,parallel)
+function js = get_json_mubench(rpc_id,app_trace,parallel)
 idx = find(strcmp(app_trace.rpc_id,rpc_id)>0,1);
 if isempty(idx)
     js = "";
@@ -23,9 +23,9 @@ else
             break
         else
             if parallel==1
-                js = js + "{"+get_json_mubench(rpcid_child,app_trace,involved_ms,parallel)+"},";
+                js = js + "{"+get_json_mubench(rpcid_child,app_trace,parallel)+"},";
             else    
-                js = js + get_json_mubench(rpcid_child,app_trace,involved_ms,parallel)+",";            
+                js = js + get_json_mubench(rpcid_child,app_trace,parallel)+",";
             end
         end
     end
