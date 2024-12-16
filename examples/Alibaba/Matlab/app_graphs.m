@@ -14,7 +14,7 @@ function [apps] = app_graphs(services_a)
         % Related Trace IDs
         app_graphs{i,2} = cat(1, entries.traces{:});
         % Related Services
-        app_graphs{i,3} = cat(1, services_a.Key{service_idx,:});
+        app_graphs{i,3} = services_a.Key(service_idx,:);
         % App graph
 
         % Get edges of services.graphs
