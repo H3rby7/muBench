@@ -5,7 +5,7 @@ function [trace_location, trace_header_lines, trace_header, trace_vartypes, entr
     % Adjust the variables in this block to your needs and conditions
 
     % *************** Trace options ***************
-    % trace_location: location of alibaba cluster trace microservices v2021
+    % trace_location of alibaba cluster trace microservices v2021
     trace_location = "MSCallGraph_0.csv";
     % how many lines to skip
     trace_header_lines = 1;
@@ -20,7 +20,7 @@ function [trace_location, trace_header_lines, trace_header, trace_vartypes, entr
     sanitized_trace_count = 200;
 
     % *************** Directories for output ***************
-    % convenient variable, does not get exported.
+    % Root DIR for output
     output_dir_root = "../traces-mbench";
     % DIR within root DIR to hold sequential output
     output_dir_sequential = output_dir_root+"/sequential";
