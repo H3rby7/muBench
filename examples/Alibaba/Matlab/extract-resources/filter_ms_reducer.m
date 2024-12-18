@@ -1,8 +1,5 @@
-function filter_ms_reducer(ms_name, intermValIter, outKVStore)
-    [~, ~, ~, ~, trace_selected_cols, trace_selected_vartypes, ~] = config();
-
-    % Create an empty table
-    T = table('Size', [0 6], 'VariableTypes',trace_selected_vartypes, 'VariableNames',trace_selected_cols);
+function filter_ms_reducer(ms_name, intermValIter, outKVStore, empty_table)
+    T = empty_table;
     
     % Append all entries we have to the table
     while hasnext(intermValIter)
