@@ -2,7 +2,7 @@ function filter_ms_mapper(data, ~, intermKVStore, used_ms)
     % Filter for the MS we are interested in and map
     relevant_traces = data(ismember(data.ms_name, used_ms),:);
     by_ms_name = findgroups(relevant_traces{:, 2});
-    % Split table based on first column - gender column
+    % Split table
     split = splitapply( @(varargin) varargin, relevant_traces , by_ms_name);
     ms_count = height(split);
     ms_tables = cell(ms_count, 2);
